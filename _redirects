@@ -1,0 +1,3 @@
+# Same-origin proxy to ArcTracker. The public /api/quests endpoint does not send
+# CORS headers, so the browser can't call it directly; Netlify rewrites it instead.
+/arc-api/*  https://arctracker.io/api/:splat  200
