@@ -5,7 +5,8 @@ A small web app for ARC Raiders players that shows which map to play next. It us
 your active quests by the map they take place on, with the busiest map first.
 
 It's a static site (HTML, CSS and plain JavaScript) with no backend. The only build step is a
-small script that writes the app key into `config.js`. Anyone can host their own copy on
+small script that writes the app key into `config.js` and can package the site for upload (see
+[Build script](#build-script)). Anyone can host their own copy on
 Netlify with their own ArcTracker app key; see [Host your own copy](#host-your-own-copy).
 
 ## Features
@@ -98,7 +99,8 @@ keys never pass through the proxy.
 | `index.html` | Page layout and the settings window |
 | `styles.css` | Styles |
 | `app.js` | API calls, map grouping and ranking, rendering |
-| `build-config.sh` | Writes `config.js` from the `ARC_APP_KEY` environment variable |
+| `build-config.sh` | Writes `config.js` from `ARC_APP_KEY`; `--package` also builds a drag-and-drop deploy in `dist/` |
+| `build-config.ps1` | Windows (PowerShell) version of `build-config.sh` |
 | `netlify.toml` | Netlify build settings (runs `build-config.sh`, publishes the repository root) |
 | `_redirects` | Netlify rule that sets up the `/arc-api/*` proxy |
 | `_headers` | Netlify headers so `sw.js` and `config.js` are always rechecked for updates |
@@ -108,7 +110,7 @@ keys never pass through the proxy.
 | `dev-server.py` | Local server: provides the proxy and serves `config.js` from `.env` |
 | `.env.example` | Template for your local `.env` |
 
-`config.js` and `.env` are generated or personal, so they're in `.gitignore` and never committed.
+`config.js`, `dist/` and `.env` are generated or personal, so they're in `.gitignore` and never committed.
 
 ## Host your own copy
 
@@ -158,14 +160,41 @@ npx netlify-cli deploy --build --prod
 
 #### Option C: drag and drop
 
-Drag-and-drop deploys skip the build step, so create `config.js` yourself first:
+A drag-and-drop deploy doesn't use Netlify's environment variables, so the build script puts
+your app key into the files before you upload them. It reads `ARC_APP_KEY` from the
+environment, or from a `.env` file (see [Running locally](#running-locally)).
+
+**macOS or Linux:**
 
 ```bash
-ARC_APP_KEY=arc_k1_your_app_key sh build-config.sh
+sh build-config.sh --package
 ```
 
-Then in Netlify choose **Add new site → Deploy manually** and drag the project folder onto the
-upload area. Check that `config.js` and `_redirects` are included.
+**Windows (PowerShell):**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\build-config.ps1 -Package
+```
+
+Both commands create:
+
+- `dist/site/`: the files to upload. Drag this **folder** onto the deploy area in Netlify
+  (**Add new site → Deploy manually** for a new site, or the bottom of the site's **Deploys**
+  page to update it). Netlify's drag-and-drop needs a folder; it doesn't accept a zip.
+- `dist/arc-quests.zip`: the same files as a zip, for hosts or tools that take a zip upload.
+
+The package leaves out `netlify.toml` on purpose. If it were included, Netlify would run the
+build again when you're signed in and replace `config.js` with an empty key.
+
+To use a different key for one build, set it on the command line instead of in `.env`:
+
+```bash
+ARC_APP_KEY=arc_k1_your_app_key sh build-config.sh --package
+```
+
+```powershell
+$env:ARC_APP_KEY = "arc_k1_your_app_key"; .\build-config.ps1 -Package
+```
 
 ### 3. Check the deploy
 
@@ -199,6 +228,38 @@ argument if you need one (`python3 dev-server.py 3000`).
 
 Opening `index.html` directly from disk (`file://`) won't work, because the quest list needs the
 proxy.
+
+## Build script
+
+`build-config.sh` (macOS and Linux) and `build-config.ps1` (Windows PowerShell) do the same
+job. Run them from anywhere; they always work in the project folder.
+
+| Command | What it does |
+|---------|--------------|
+| `sh build-config.sh` | Writes `config.js` with the app key. This is what Netlify runs on each build. |
+| `sh build-config.sh --package` | Writes `config.js`, then creates `dist/site/` and `dist/arc-quests.zip` for a manual upload. |
+| `.\build-config.ps1` | Windows version of `sh build-config.sh`. |
+| `.\build-config.ps1 -Package` | Windows version of `sh build-config.sh --package`. |
+
+If PowerShell blocks the script with an execution policy error, run it like this instead:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\build-config.ps1 -Package
+```
+
+**Where the app key comes from.** The scripts use the `ARC_APP_KEY` environment variable if
+it's set, and otherwise the `ARC_APP_KEY=` line in `.env`. The key may only contain letters,
+numbers, `_` and `-`; anything else stops the script with an error.
+
+**Without a key.** A plain build warns and writes `config.js` with an empty key, so the site
+shows a "no app key configured" message. A `--package` / `-Package` build stops with an error
+instead, since the package would be unusable.
+
+**What goes in the package.** `dist/site/` contains only what the live site needs: the page,
+styles and scripts, `config.js`, the manifest and service worker, `_redirects`, `_headers` and
+the icons. It leaves out the dev server, README, `.env` and `netlify.toml` (see
+[Option C](#option-c-drag-and-drop) for why). `dist/` is replaced on every packaging run. If
+you add a file the site needs, add it to the file list in **both** scripts.
 
 ## Changing the app icon
 
