@@ -231,6 +231,7 @@ dialog form { padding: 20px; display: grid; gap: 8px; }
 dialog h2 { margin: 0; }
 .hint, .muted { color: var(--muted); font-size: 0.85rem; }
 .hint { margin: 0 0 8px; }
+.hint a { color: var(--accent); }
 dialog label { font-size: 0.9rem; margin-top: 6px; }
 dialog input[type="password"], dialog input[type="text"] {
   /* 16px stops iOS from zooming in when the field is focused. */

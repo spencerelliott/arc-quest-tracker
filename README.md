@@ -22,15 +22,34 @@ Netlify with their own ArcTracker app key; see [Host your own copy](#host-your-o
   collapsed.
 - **Works on phones and tablets.** The layout adapts to small screens, and you can add the app
   to your home screen, where it opens full-screen as "ARC Quests" with its own icon.
-- **Links to ArcTracker.** Each quest links to its page on arctracker.io, where you can mark it
-  complete. The ArcTracker API is read-only, so this app can't mark quests complete itself.
-  Click **Refresh** afterwards to update the list.
+- **Guide lookup.** Each quest has a **Look up guide** link that opens a Google search for
+  "Arc Raiders *quest name* guide" in a new tab.
+- **Link to ArcTracker.** The **ArcTracker** button in the header opens your quest tracker on
+  arctracker.io, where you can mark quests complete. The ArcTracker API is read-only, so this
+  app can't mark quests complete itself. Click **Refresh** afterwards to update the list.
 
 ## Using it
 
-1. In ArcTracker, go to **Settings → Developer Access** and create a user key (`arc_u1_…`)
-   with the `quests:read` scope.
-2. Open the app, click the ⚙️ button, paste your user key, and click **Save**.
+To load your quests, the app needs a user API key from your ArcTracker account.
+
+### Create your ArcTracker user key
+
+1. Sign in at [arctracker.io](https://arctracker.io) and open
+   [Settings](https://arctracker.io/settings).
+2. Scroll down to the **Developer Access** section and click **Create API Key**.
+3. Under **Key Name**, enter a name you'll recognise, such as `ARC Quests`.
+4. Under **Data Scopes**, tick **Quests** only. **Profile** is ticked by default, so untick it.
+   This app only reads your quest progress and doesn't need any other data.
+5. Click **Create Key** and copy the key it shows you. It starts with `arc_u1_`. Keep it
+   somewhere safe in case you need to enter it again.
+
+You can delete the key at any time from the same **Developer Access** section, using the bin
+icon next to it. The app then stops being able to read your progress.
+
+### Add the key to the app
+
+1. Open the app and click the ⚙️ button.
+2. Paste your key into **User key** and click **Save**.
 
 Your user key is stored only in your browser's `localStorage` and is sent only to
 `arctracker.io`.
@@ -200,8 +219,9 @@ the app from the home screen and add it again to see a new one.
 
 - **"Couldn't load /quests…"**: the `/arc-api` proxy isn't available. Use `dev-server.py`
   locally, or check that `_redirects` was deployed.
-- **"Invalid user key" or 401/403 errors**: check your user key in Settings and make sure it
-  has the `quests:read` scope.
+- **"Invalid user key" or 401/403 errors**: check the key you pasted into Settings, and check
+  in ArcTracker that the key has the **Quests** scope. If not, create a new key with **Quests**
+  ticked.
 - **429 errors**: the app's shared rate limit is used up. Wait for it to reset; the limit is
   per hour.
 - **The app still shows an old version after a deploy**: the service worker fetches fresh files
