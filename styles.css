@@ -15,11 +15,20 @@
 
 * { box-sizing: border-box; }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Allow scrolling but not pinch or double-tap zoom. */
+  touch-action: pan-x pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
   font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overscroll-behavior-y: none;
 }
 
 code { font-size: 0.9em; }
@@ -33,7 +42,8 @@ code { font-size: 0.9em; }
   gap: 12px;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  /* Safe-area insets keep content clear of the notch when launched from the home screen. */
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));
   background: rgba(15, 18, 22, 0.92);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--border);
@@ -42,7 +52,11 @@ code { font-size: 0.9em; }
 .subtitle { margin: 0; color: var(--muted); font-size: 0.85rem; }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-main { max-width: 960px; margin: 0 auto; padding: 16px; }
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
 
 .btn {
   font: inherit;
@@ -74,7 +88,7 @@ main { max-width: 960px; margin: 0 auto; padding: 16px; }
 .summary {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px 16px;
   margin-bottom: 16px;
   color: var(--muted);
   font-size: 0.9rem;
@@ -202,6 +216,9 @@ details[open] > summary > .chev { transform: rotate(90deg); }
 /* Settings dialog */
 dialog {
   width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow: auto;
+  overscroll-behavior: contain;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -215,7 +232,8 @@ dialog h2 { margin: 0; }
 .hint { margin: 0 0 8px; }
 dialog label { font-size: 0.9rem; margin-top: 6px; }
 dialog input[type="password"], dialog input[type="text"] {
-  font: 14px ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* 16px stops iOS from zooming in when the field is focused. */
+  font: 16px ui-monospace, SFMono-Regular, Menlo, monospace;
   width: 100%;
   padding: 8px 10px;
   border-radius: 6px;
@@ -224,7 +242,8 @@ dialog input[type="password"], dialog input[type="text"] {
   color: var(--text);
 }
 dialog input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-label.check { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+label.check { display: flex; gap: 8px; align-items: center; margin-top: 4px; min-height: 32px; }
+label.check input { width: 18px; height: 18px; flex: none; margin: 0; }
 fieldset { border: 1px solid var(--border); border-radius: 8px; margin: 8px 0 0; padding: 8px 12px 12px; }
 legend { color: var(--muted); font-size: 0.85rem; padding: 0 4px; }
 .debug summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
@@ -243,7 +262,27 @@ legend { color: var(--muted); font-size: 0.85rem; padding: 0 4px; }
 .spacer { flex: 1; }
 
 @media (max-width: 560px) {
+  .topbar { flex-wrap: nowrap; }
+  .brand { min-width: 0; }
+  .actions { flex-wrap: nowrap; }
   .actions .ghost { display: none; }
+  .brand h1 { font-size: 1.15rem; white-space: nowrap; }
+  main { padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
+  .quests { padding: 6px; }
   .quest-body { padding-left: 12px; }
   .map > summary { gap: 10px; padding: 12px; }
+  .quest > summary { flex-wrap: wrap; row-gap: 4px; }
+  .quest-name { flex: 1 1 140px; }
+  dialog form { padding: 16px; }
+}
+
+@media (max-width: 400px) {
+  .subtitle { display: none; }
+}
+
+/* Touch devices: larger tap targets. */
+@media (pointer: coarse) {
+  .btn { min-height: 40px; }
+  .btn.icon { min-width: 40px; justify-content: center; align-items: center; }
+  .quest > summary { min-height: 44px; }
 }

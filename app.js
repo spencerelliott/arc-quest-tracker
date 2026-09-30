@@ -92,9 +92,10 @@
   // ---------- API ----------
 
   class ApiError extends Error {
-    constructor(message, status) {
+    constructor(message, status, code) {
       super(message);
       this.status = status;
+      this.code = code;
     }
   }
 
@@ -117,7 +118,7 @@
     if (!res.ok) {
       const msg = json?.error?.message || `HTTP ${res.status}`;
       const code = json?.error?.code ? ` [${json.error.code}]` : "";
-      throw new ApiError(`${label}: ${msg}${code}`, res.status);
+      throw new ApiError(`${label}: ${msg}${code}`, res.status, json?.error?.code);
     }
     return json;
   }
@@ -412,9 +413,8 @@
     summaryNode.hidden = false;
     summaryNode.replaceChildren(
       el("span", {}, el("strong", {}, view.totalOpen), " active quests"),
-      el("span", {}, "·"),
       el("span", {}, el("strong", {}, view.completedCount), ` of ${view.totalQuests} completed`),
-      ...(settings.showLocked && view.totalLocked ? [el("span", {}, "·"), el("span", {}, el("strong", {}, view.totalLocked), " locked shown")] : [])
+      ...(settings.showLocked && view.totalLocked ? [el("span", {}, el("strong", {}, view.totalLocked), " locked shown")] : [])
     );
 
     if (!view.maps.length) {
@@ -478,6 +478,10 @@
       render(buildView(catalog, progress));
     } catch (err) {
       console.error(err);
+      if (/app_key/.test(err.code || "")) {
+        setStatus("This site's ArcTracker app key was rejected. The site owner needs to update ARC_APP_KEY and redeploy (see README).", { error: true });
+        return;
+      }
       const authProblem = err.status === 401 || err.status === 403;
       setStatus(err.message, {
         error: true,
@@ -544,6 +548,13 @@
   }
   document.getElementById("expand-all").addEventListener("click", () => setAll(true));
   document.getElementById("collapse-all").addEventListener("click", () => setAll(false));
+
+  // iOS Safari ignores user-scalable=no, so block its pinch-zoom gestures directly.
+  document.addEventListener("gesturestart", (e) => e.preventDefault());
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch((err) => console.warn("Service worker registration failed", err));
+  }
 
   refresh();
 })();

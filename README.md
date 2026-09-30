@@ -1,4 +1,4 @@
-# Arc Quest Planner
+# ARC Quests
 
 A small web app for ARC Raiders players that shows which map to play next. It uses the
 [ArcTracker API](https://arctracker.io/developers/docs) to load your quest progress, then groups
@@ -20,6 +20,8 @@ Netlify with their own ArcTracker app key; see [Host your own copy](#host-your-o
   that unlocks it is done. You can also show locked quests in Settings.
 - **Collapsible sections.** Any map or quest can be collapsed, and the app remembers what you
   collapsed.
+- **Works on phones and tablets.** The layout adapts to small screens, and you can add the app
+  to your home screen, where it opens full-screen as "ARC Quests" with its own icon.
 - **Links to ArcTracker.** Each quest links to its page on arctracker.io, where you can mark it
   complete. The ArcTracker API is read-only, so this app can't mark quests complete itself.
   Click **Refresh** afterwards to update the list.
@@ -32,6 +34,15 @@ Netlify with their own ArcTracker app key; see [Host your own copy](#host-your-o
 
 Your user key is stored only in your browser's `localStorage` and is sent only to
 `arctracker.io`.
+
+### Add it to your home screen
+
+- **iPhone or iPad (Safari):** tap the Share button, then **Add to Home Screen**.
+- **Android (Chrome):** open the ⋮ menu and tap **Add to Home screen** or **Install app**.
+
+It opens full-screen as "ARC Quests", like a regular app. It still needs an internet connection
+to load quest data. Your user key is saved separately for the home-screen app on iPhone, so you
+may need to enter it again there.
 
 ### About the app key
 
@@ -71,6 +82,10 @@ keys never pass through the proxy.
 | `build-config.sh` | Writes `config.js` from the `ARC_APP_KEY` environment variable |
 | `netlify.toml` | Netlify build settings (runs `build-config.sh`, publishes the repository root) |
 | `_redirects` | Netlify rule that sets up the `/arc-api/*` proxy |
+| `_headers` | Netlify headers so `sw.js` and `config.js` are always rechecked for updates |
+| `manifest.webmanifest` | Home-screen name, icons and colours |
+| `sw.js` | Service worker that makes the app installable and caches the page files |
+| `icons/` | App icons; `icon.svg` is the source for the PNG sizes |
 | `dev-server.py` | Local server: provides the proxy and serves `config.js` from `.env` |
 | `.env.example` | Template for your local `.env` |
 
@@ -166,6 +181,18 @@ argument if you need one (`python3 dev-server.py 3000`).
 Opening `index.html` directly from disk (`file://`) won't work, because the quest list needs the
 proxy.
 
+## Changing the app icon
+
+Edit `icons/icon.svg`, then regenerate the PNG sizes. On macOS:
+
+```bash
+cd icons && for s in 512 192; do sips -s format png -z $s $s icon.svg --out icon-$s.png; done && sips -s format png -z 180 180 icon.svg --out apple-touch-icon.png && sips -s format png -z 32 32 icon.svg --out favicon-32.png
+```
+
+Keep the important part of the design within the middle 80% of the square, because Android
+crops the edges of home-screen icons. Phones cache home-screen icons, so you may need to remove
+the app from the home screen and add it again to see a new one.
+
 ## Troubleshooting
 
 - **"This site has no ArcTracker app key configured"**: `config.js` is missing or its
@@ -177,6 +204,9 @@ proxy.
   has the `quests:read` scope.
 - **429 errors**: the app's shared rate limit is used up. Wait for it to reset; the limit is
   per hour.
+- **The app still shows an old version after a deploy**: the service worker fetches fresh files
+  whenever you're online, so closing and reopening the app should fix it. If it doesn't, change
+  `CACHE` in `sw.js` (for example to `arc-quests-v2`) and redeploy.
 - **No quests, or progress looks wrong**: ArcTracker doesn't document the format of the progress
   response, so the app handles several likely formats. Open **Settings → Debug** to see the raw
   response and compare it with `loadProgress()` in `app.js`.

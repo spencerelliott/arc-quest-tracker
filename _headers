@@ -1,0 +1,5 @@
+# Always revalidate the service worker and generated config so updates apply promptly.
+/sw.js
+  Cache-Control: no-cache
+/config.js
+  Cache-Control: no-cache
