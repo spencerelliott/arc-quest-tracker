@@ -380,11 +380,10 @@
       extras.append(el("div", { class: "also" }, el("b", {}, "Also on: "), otherMaps.map(mapName).join(", ")));
     }
     if (extras.childNodes.length) body.append(extras);
-    if (q.slug) {
-      body.append(
-        el("a", { class: "ext-link", href: `${SITE_BASE}/quests/${encodeURIComponent(q.slug)}`, target: "_blank", rel: "noopener" }, "View on ArcTracker ↗")
-      );
-    }
+    const guideSearch = new URLSearchParams({ q: `Arc Raiders ${q.name} guide` });
+    body.append(
+      el("a", { class: "ext-link", href: `https://www.google.com/search?${guideSearch}`, target: "_blank", rel: "noopener" }, "Look up guide ↗")
+    );
 
     return collapsible(`q-${mapId}-${q.id}`, "quest", summary, body, false);
   }
