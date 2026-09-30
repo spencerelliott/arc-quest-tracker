@@ -1,6 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="#0f1216"/>
-  <circle cx="256" cy="256" r="200" fill="#171b21"/>
-  <path d="M256 430 L156.6 283.3 A120 120 0 1 1 355.4 283.3 Z" fill="#f2b33d" stroke="#f2b33d" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M198 216 L240 258 L316 178" fill="none" stroke="#0f1216" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Racing stripes in the ARC Raiders logo colours, sweeping behind the pin. -->
+  <g fill="none" stroke-width="24" opacity="0.9">
+    <path d="M17.8 -40.0 L177.6 260.4 A150 150 0 0 0 310.0 340.0 L560 340.0" stroke="#FF0000"/>
+    <path d="M-23.0 -40.0 L145.8 277.3 A186 186 0 0 0 310.0 376.0 L560 376.0" stroke="#FFEA00"/>
+    <path d="M-63.7 -40.0 L114.0 294.2 A222 222 0 0 0 310.0 412.0 L560 412.0" stroke="#05FF74"/>
+    <path d="M-104.5 -40.0 L82.2 311.1 A258 258 0 0 0 310.0 448.0 L560 448.0" stroke="#5FFFFF"/>
+  </g>
+  <!-- Map pin: white like the ARC Raiders wordmark, with a dark outline to separate it from the stripes. -->
+  <path d="M256 430 L156.6 283.3 A120 120 0 1 1 355.4 283.3 Z" fill="#ffffff" stroke="#0f1216" stroke-width="16" stroke-linejoin="round" paint-order="stroke"/>
+  <path d="M198 216 L240 258 L316 178" fill="none" stroke="#0f1216" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
