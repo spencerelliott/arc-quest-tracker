@@ -10,6 +10,9 @@
   --ok: #4cc38a;
   --danger: #ef6b6b;
   --radius: 10px;
+  /* Extra space above the header when launched from the home screen, to clear the
+     iOS Liquid Glass blur that extends below the status bar. */
+  --standalone-top-gap: 24px;
   color-scheme: dark;
 }
 
@@ -262,6 +265,12 @@ legend { color: var(--muted); font-size: 0.85rem; padding: 0 4px; }
 }
 .dialog-actions { display: flex; gap: 8px; margin-top: 12px; }
 .spacer { flex: 1; }
+
+/* Installed to the home screen: the page runs under the status bar, so push the header
+   below it plus the blur area. */
+@media (display-mode: standalone) {
+  .topbar { padding-top: calc(env(safe-area-inset-top) + var(--standalone-top-gap)); }
+}
 
 @media (max-width: 560px) {
   .topbar { flex-wrap: nowrap; }
