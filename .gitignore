@@ -4,3 +4,4 @@ __pycache__/
 .env
 config.js
 *.zip
+dist/
