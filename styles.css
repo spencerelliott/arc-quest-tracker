@@ -72,6 +72,7 @@ main {
 .btn.ghost { background: transparent; }
 .btn.danger { color: var(--danger); }
 .btn.icon { padding: 6px; display: inline-flex; }
+.btn.link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
 .btn:disabled { opacity: 0.5; cursor: default; }
 
 .status:empty { display: none; }
@@ -278,6 +279,8 @@ legend { color: var(--muted); font-size: 0.85rem; padding: 0 4px; }
 
 @media (max-width: 400px) {
   .subtitle { display: none; }
+  .btn.link .label { display: none; }
+  .btn.link { padding: 6px; min-width: 40px; justify-content: center; }
 }
 
 /* Touch devices: larger tap targets. */

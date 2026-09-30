@@ -390,8 +390,8 @@
   }
 
   function renderMap(group, index) {
-    const metaParts = [`${group.objectiveCount} open step${group.objectiveCount === 1 ? "" : "s"}`];
-    if (group.id !== ANY_MAP) metaParts.push(`${group.exclusiveCount} only here`);
+    const metaParts = [`${group.activeCount} quest${group.activeCount === 1 ? "" : "s"} available`];
+    if (group.id !== ANY_MAP) metaParts.push(`${group.exclusiveCount} only on this map`);
     const lockedCount = group.quests.length - group.activeCount;
     if (lockedCount) metaParts.push(`${lockedCount} locked`);
 
